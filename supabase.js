@@ -1,10 +1,3 @@
-// Supabase クライアント
-// 環境変数から URL と anon key を読み込みます。
-// Vercel の場合: Project Settings → Environment Variables に設定してください。
-//
-//   VITE_SUPABASE_URL  = https://xxxxxxxxxx.supabase.co
-//   VITE_SUPABASE_ANON_KEY = eyJhbGci...
-
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? "";
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? "";
 
@@ -56,10 +49,33 @@ export function createClient(url = SUPABASE_URL, key = SUPABASE_ANON_KEY) {
       });
       if (!res.ok) throw new Error(`削除失敗: ${res.status}`);
     },
+
+    // 画像アップロード（Supabase Storage）
+    async uploadImage(file) {
+      const ext = file.name.split(".").pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const res = await fetch(
+        `${url}/storage/v1/object/recipe-images/${fileName}`,
+        {
+          method: "POST",
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            "Content-Type": file.type,
+          },
+          body: file,
+        }
+      );
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(`画像アップロード失敗: ${res.status} ${body}`);
+      }
+      // 公開URLを返す
+      return `${url}/storage/v1/object/public/recipe-images/${fileName}`;
+    },
   };
 }
 
-// ── デバッグ用接続テスト ──────────────────────────────────────
 export async function runConnectionTest(url, key) {
   const endpoint = `${url}/rest/v1/recipes?select=*&limit=1&order=created_at.desc`;
   const log = {
@@ -72,38 +88,18 @@ export async function runConnectionTest(url, key) {
     corsHint: null,
     success: false,
   };
-
   try {
-    const res = await fetch(endpoint, {
-      method: "GET",
-      headers: makeHeaders(key),
-    });
+    const res = await fetch(endpoint, { method: "GET", headers: makeHeaders(key) });
     log.status = res.status;
     log.statusText = res.statusText;
-    try {
-      log.responseBody = await res.text();
-    } catch {
-      log.responseBody = "(本文取得不可)";
-    }
+    try { log.responseBody = await res.text(); } catch { log.responseBody = "(本文取得不可)"; }
     if (res.ok) log.success = true;
   } catch (e) {
     log.fetchError = e.message || String(e);
     const msg = (e.message || "").toLowerCase();
-    if (
-      msg.includes("failed to fetch") ||
-      msg.includes("networkerror") ||
-      msg.includes("load failed") ||
-      msg.includes("cors") ||
-      msg.includes("network request failed")
-    ) {
+    if (msg.includes("failed to fetch") || msg.includes("networkerror") || msg.includes("load failed") || msg.includes("cors") || msg.includes("network request failed")) {
       log.isCors = true;
-      log.corsHint =
-        "「Failed to fetch」はCORS制限の典型症状です。\n\n" +
-        "【Vercelへのデプロイ後は通常解消されます】\n" +
-        "もし本番でも発生する場合は:\n" +
-        "① Supabase Dashboard → Project Settings → API\n" +
-        "   → Allowed Origins にデプロイ先URLを追加\n" +
-        "② .env ファイルの VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY を確認";
+      log.corsHint = "「Failed to fetch」はCORS制限の典型症状です。\nNetlify/Vercelにデプロイ後は通常解消されます。";
     }
   }
   return log;
