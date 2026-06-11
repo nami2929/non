@@ -2,10 +2,41 @@
 <html lang="ja">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
     <title>ノンフライヤーレシピ集</title>
     <meta name="description" content="みんなでシェアするノンフライヤーレシピ集" />
+
+    <!-- PWA manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- テーマカラー -->
+    <meta name="theme-color" content="#c0541a" />
+    <meta name="msapplication-TileColor" content="#c0541a" />
+    <meta name="msapplication-TileImage" content="/icon-144x144.png" />
+
+    <!-- iOS Safari PWA設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="レシピ集" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="192x192" href="/icon-192x192.png" />
+
+    <!-- iOS スプラッシュスクリーン背景色 -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
+    <!-- favicon -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192x192.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- OGP -->
+    <meta property="og:title" content="ノンフライヤーレシピ集" />
+    <meta property="og:description" content="みんなでシェアするノンフライヤーレシピ集" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/icon-512x512.png" />
+
+    <!-- フォント -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
